@@ -10,6 +10,7 @@ namespace VelazquezYahir.Models.Domain
         public required string Titulo { get; set; }
         public required string Descripcion { get; set; }
         public required string Autor { get; set; }
+
         public required string Img { get; set; }
         [ForeignKey("Categorias")]
         public required int Categoria { get; set; }
