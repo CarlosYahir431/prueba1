@@ -6,14 +6,13 @@ using VelazquezYahir.Services.Services;
 // Add services to the container.
 var builder = WebApplication.CreateBuilder(args);
 
-builder.Services.AddDbContext<ApplicationDBContext>(options =>
-    options.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnection")));
+builder.Services.AddDbContext<ApplicationDBContext>(options => 
+options.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnection")));
 builder.Services.AddTransient<IUserService, UserService>();
-builder.Services.AddTransient<IBookService, BookService>();
-builder.Services.AddTransient<ICategoriaService, CategoriaService>();
 builder.Services.AddControllersWithViews();
 
 var app = builder.Build();
+// Registrar el DbContext
 
 // Configure the HTTP request pipeline.
 if (!app.Environment.IsDevelopment())
@@ -24,12 +23,15 @@ if (!app.Environment.IsDevelopment())
 }
 
 app.UseHttpsRedirection();
-app.UseStaticFiles(); // Asegúrate de que los archivos estáticos se sirvan correctamente
 app.UseRouting();
+
 app.UseAuthorization();
+
+app.MapStaticAssets();
 
 app.MapControllerRoute(
     name: "default",
-    pattern: "{controller=User}/{action=Index}/{id?}");
+    pattern: "{controller=User}/{action=Index}/{id?}")
+    .WithStaticAssets();
 
 app.Run();

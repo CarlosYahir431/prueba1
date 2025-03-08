@@ -1,5 +1,4 @@
-﻿using Azure.Core;
-using Microsoft.AspNetCore.Mvc;
+﻿using Microsoft.AspNetCore.Mvc;
 using VelazquezYahir.Models.Domain;
 using VelazquezYahir.Services.IServices;
 
@@ -27,35 +26,13 @@ namespace VelazquezYahir.Controllers
         [HttpPost]
         public IActionResult Crear(Usuario usuario)
         {
-            _userService.CreateUser(usuario);
-            return RedirectToAction("Index");
-        }
+            if (ModelState.IsValid)
+            {
+                _userService.CreateUser(usuario); // Llama al servicio para crear el usuario
 
-        public IActionResult Editar(int id)
-        { 
-            var usuario = _userService.GetUserById(id);
+                return RedirectToAction("Index");
+            }
             return View(usuario);
-        }
-
-        [HttpPost]
-        public IActionResult Editar(Usuario usuario)
-        {
-            _userService.UpdateUser(usuario);
-            return RedirectToAction("Index");
-        }
-
-        [HttpDelete]
-        public IActionResult Eliminar(int id)
-        {
-            var result =_userService.DeleteUser(id);
-            if (result == true)
-            {
-                return Json(new { success = true });
-            }
-            else
-            {
-                return Json(new { success = false });
-            }
         }
     }
 }

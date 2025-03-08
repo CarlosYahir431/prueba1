@@ -6,7 +6,7 @@ namespace VelazquezYahir.Models.Domain
     public class Usuario
     {
         [Key]
-        public int PkUsuario { get; set;}
+        public int PkUsuario {get; set;}
         public required string Nombre { get; set; }
         public required string UserName { get; set; }
         public required string Password { get; set; }

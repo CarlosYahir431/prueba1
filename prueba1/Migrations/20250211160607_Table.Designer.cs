@@ -11,69 +11,18 @@ using VelazquezYahir.Context;
 namespace VelazquezYahir.Migrations
 {
     [DbContext(typeof(ApplicationDBContext))]
-    [Migration("20250305212545_prueba2")]
-    partial class prueba2
+    [Migration("20250211160607_Table")]
+    partial class Table
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
-                .HasAnnotation("ProductVersion", "9.0.2")
+                .HasAnnotation("ProductVersion", "9.0.1")
                 .HasAnnotation("Relational:MaxIdentifierLength", 128);
 
             SqlServerModelBuilderExtensions.UseIdentityColumns(modelBuilder);
-
-            modelBuilder.Entity("VelazquezYahir.Models.Domain.Book", b =>
-                {
-                    b.Property<int>("PkBook")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("int");
-
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("PkBook"));
-
-                    b.Property<string>("Autor")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<int>("Categoria")
-                        .HasColumnType("int");
-
-                    b.Property<string>("Descripcion")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<string>("Img")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<string>("Titulo")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
-
-                    b.HasKey("PkBook");
-
-                    b.HasIndex("Categoria");
-
-                    b.ToTable("Books");
-                });
-
-            modelBuilder.Entity("VelazquezYahir.Models.Domain.Categoria", b =>
-                {
-                    b.Property<int>("PkCategoria")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("int");
-
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("PkCategoria"));
-
-                    b.Property<string>("Nombre")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
-
-                    b.HasKey("PkCategoria");
-
-                    b.ToTable("Categorias");
-                });
 
             modelBuilder.Entity("VelazquezYahir.Models.Domain.Role", b =>
                 {
@@ -96,11 +45,6 @@ namespace VelazquezYahir.Migrations
                         {
                             PkRole = 1,
                             Nombre = "Admin"
-                        },
-                        new
-                        {
-                            PkRole = 2,
-                            Nombre = "Usuario"
                         });
                 });
 
@@ -142,17 +86,6 @@ namespace VelazquezYahir.Migrations
                             Password = "caritademiel123xd",
                             UserName = "Arrozquemado49"
                         });
-                });
-
-            modelBuilder.Entity("VelazquezYahir.Models.Domain.Book", b =>
-                {
-                    b.HasOne("VelazquezYahir.Models.Domain.Categoria", "Categorias")
-                        .WithMany()
-                        .HasForeignKey("Categoria")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.Navigation("Categorias");
                 });
 
             modelBuilder.Entity("VelazquezYahir.Models.Domain.Usuario", b =>
