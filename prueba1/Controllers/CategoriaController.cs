@@ -5,19 +5,19 @@ using VelazquezYahir.Services.IServices;
 
 namespace VelazquezYahir.Controllers
 {
-    public class UserController : Controller
+    public class CategoriaController : Controller
     {
-        private readonly IUserService _userService;
-        public UserController(IUserService userservice)
+        private readonly ICategoriaService _categoriaService;
+        public CategoriaController(ICategoriaService categoriaservice)
         {
-            _userService = userservice;
+            _categoriaService = categoriaservice;
         }
 
         [HttpGet]
         public IActionResult Index()
         {
-            var GetUser = _userService.GetUsers();
-            return View(GetUser);
+            var CategoriaList = _categoriaService.GetCategorias();
+            return View(CategoriaList);
         }
         public IActionResult Crear()
         {
@@ -25,29 +25,29 @@ namespace VelazquezYahir.Controllers
         }
 
         [HttpPost]
-        public IActionResult Crear(Usuario usuario)
+        public IActionResult Crear(Categoria categoria)
         {
-            _userService.CreateUser(usuario);
+            _categoriaService.CreateCategoria(categoria);
             return RedirectToAction("Index");
         }
 
         public IActionResult Editar(int id)
-        { 
-            var usuario = _userService.GetUserById(id);
-            return View(usuario);
+        {
+            var categoria = _categoriaService.GetCategoriaById(id);
+            return View(categoria);
         }
 
         [HttpPost]
-        public IActionResult Editar(Usuario usuario)
+        public IActionResult Editar(Categoria categoria)
         {
-            _userService.UpdateUser(usuario);
+            _categoriaService.UpdateCategoria(categoria);
             return RedirectToAction("Index");
         }
 
         [HttpDelete]
         public IActionResult Eliminar(int id)
         {
-            var result =_userService.DeleteUser(id);
+            var result = _categoriaService.DeleteCategoria(id);
             if (result == true)
             {
                 return Json(new { success = true });

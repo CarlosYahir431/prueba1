@@ -1,12 +1,11 @@
 ﻿using System.ComponentModel.DataAnnotations;
-using Microsoft.EntityFrameworkCore.Metadata.Internal;
 
 namespace VelazquezYahir.Models.Domain
 {
-    public class Role
+    public class Categoria
     {
         [Key]
-        public int PkRole { get; set; }
+        public int PkCategoria { get; set; }
         public string Nombre { get; set; }
     }
 }

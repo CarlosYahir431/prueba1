@@ -2,52 +2,58 @@
 using Microsoft.AspNetCore.Mvc;
 using VelazquezYahir.Models.Domain;
 using VelazquezYahir.Services.IServices;
+using VelazquezYahir.Services.Services;
 
 namespace VelazquezYahir.Controllers
 {
-    public class UserController : Controller
+    public class BookController : Controller
     {
-        private readonly IUserService _userService;
-        public UserController(IUserService userservice)
+        private readonly IBookService _bookService;
+        private readonly ICategoriaService _categoriaService;
+
+        public BookController(IBookService bookservice, ICategoriaService categoriaService)
         {
-            _userService = userservice;
+            _bookService = bookservice;
+
+            _categoriaService = categoriaService;
         }
 
         [HttpGet]
         public IActionResult Index()
         {
-            var GetUser = _userService.GetUsers();
-            return View(GetUser);
+            var BookList = _bookService.GetBooks();
+            return View(BookList);
         }
         public IActionResult Crear()
         {
+            ViewBag.Categorias = _categoriaService.GetCategorias();
             return View();
         }
 
         [HttpPost]
-        public IActionResult Crear(Usuario usuario)
+        public IActionResult Crear(Book libro)
         {
-            _userService.CreateUser(usuario);
+            _bookService.CreateBook(libro);
             return RedirectToAction("Index");
         }
 
         public IActionResult Editar(int id)
         { 
-            var usuario = _userService.GetUserById(id);
-            return View(usuario);
+            var libro = _bookService.GetBookById(id);
+            return View(libro);
         }
 
         [HttpPost]
-        public IActionResult Editar(Usuario usuario)
+        public IActionResult Editar(Book libro)
         {
-            _userService.UpdateUser(usuario);
+            _bookService.UpdateBook(libro);
             return RedirectToAction("Index");
         }
 
         [HttpDelete]
         public IActionResult Eliminar(int id)
         {
-            var result =_userService.DeleteUser(id);
+            var result = _bookService.DeleteBook(id);
             if (result == true)
             {
                 return Json(new { success = true });

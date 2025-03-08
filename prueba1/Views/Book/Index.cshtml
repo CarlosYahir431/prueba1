@@ -1,0 +1,136 @@
+﻿@model IEnumerable<VelazquezYahir.Models.Domain.Book>
+@{
+	Layout = "_LayoutDashboard";
+
+}
+<h1>Libros</h1>
+
+
+<div class="container-fluid">
+	<div class="offset-12">
+		<div class="card border">
+			<div class="card-header">
+				<h2 class="">Lista de libros</h2>
+				<div>
+					<a asp-action="Crear" class="btn btn-success mx-auto btn-md">Crear Nuevo Libro</a>
+				</div>
+			</div>
+			<div class="card-body">
+
+				<table class="table table-primary table-striped table-hover">
+					<thead>
+						<tr>
+							<th>
+								@Html.DisplayNameFor(model => model.Titulo)
+							</th>
+							<th>
+								@Html.DisplayNameFor(model => model.Autor)
+							</th>
+							<th>
+								@Html.DisplayNameFor(model => model.Descripcion)
+							</th>
+							<th>
+								@Html.DisplayNameFor(model => model.Img)
+							</th>
+							<th>
+								@Html.DisplayNameFor(model => model.Categoria)
+							</th>
+
+							<th>Acciones</th>
+						</tr>
+					</thead>
+					<tbody>
+						@foreach (var item in Model)
+						{
+							<tr>
+								<td>
+									@Html.DisplayFor(modelItem => item.Titulo)
+								</td>
+								<td class="">
+									@Html.DisplayFor(modelItem => item.Autor)
+								</td>
+								<td>
+									@Html.DisplayFor(modelItem => item.Descripcion)
+								</td>
+								<td>
+									@Html.DisplayFor(modelItem => item.Img)
+								</td>
+								<td>
+									@Html.DisplayFor(modelItem => item.Categorias.Nombre)
+								</td>
+								<td>
+									<a asp-action="Editar" asp-route-id="@item.PkBook" class="btn btn-warning">Edit</a>
+									<a data-id="@item.PkBook" class="btn btn-danger eliminar-libro">Delete</a>
+								</td>
+							</tr>
+						}
+					</tbody>
+				</table>
+
+			</div>
+
+		</div>
+	</div>
+</div>
+
+
+@section Scripts {
+	<script>
+		$(document).ready(function () {
+
+
+
+
+			$('.eliminar-libro').on('click', function () {
+				//if (confirm('¿Estás seguro de que deseas eliminar este artículo?')) {}
+
+
+				Swal.fire({
+					title: "Esta seguro que deseas borrar?",
+					text: "No podrás revertir esto.!",
+					icon: "warning",
+
+					showCancelButton: true,
+					confirmButtonColor: "#3085d6",
+					cancelButtonColor: "#d33",
+					confirmButtonText: "Sí, deseo borrar!"
+				}).then((result) => {
+					if (result.isConfirmed) {
+
+						var bookid = $(this).data('id');
+
+						$.ajax({
+							url: '/Book/Eliminar/' + bookid,
+							type: 'DELETE',
+							success: function (data) {
+								console.log(data)
+
+								if (data.success == true) {
+									location.reload();
+								}
+
+							}
+						});
+
+
+						Swal.fire({
+							title: "Eliminando!",
+							text: "ha sido eliminado correctamente.",
+							icon: "success",
+							timer: 5000
+						});
+					}
+				});
+
+			});
+
+		});
+
+
+
+
+
+
+	</script>
+}
+
