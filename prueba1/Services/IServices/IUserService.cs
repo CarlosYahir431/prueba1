@@ -6,6 +6,8 @@ namespace VelazquezYahir.Services.IServices
     {
         public List<Usuario> GetUsers();
         public bool CreateUser(Usuario request);
-
+        public Usuario GetUserById(int id);
+        public bool UpdateUser(Usuario request);
+        public bool DeleteUser(int PkUsuario);
     }
 }

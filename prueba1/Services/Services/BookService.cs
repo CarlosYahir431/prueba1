@@ -9,20 +9,18 @@ using VelazquezYahir.Services.IServices;
 
 namespace VelazquezYahir.Services.Services
 {
-    public class UserService : IUserService
+    public class BookService : IBookService
     {
         private readonly ApplicationDBContext _context;
-        public UserService(ApplicationDBContext context)
+        public BookService(ApplicationDBContext context)
         {
             _context = context;
         }
-        public List<Usuario> GetUsers()
+        public List<Book> GetBooks()
         {
             try
             {
-                return _context.Usuarios
-                    .Include(x => x.Roles)
-                    .ToList();
+                return _context.Books.Include(x=> x.Categorias).ToList();
             }
             catch (SqlException ex)
             {
@@ -31,28 +29,29 @@ namespace VelazquezYahir.Services.Services
             catch (Exception ex)
             {
                 throw new Exception("Ocurrió un error inesperado: " + ex.Message);
-        }
+            }
         }
 
-        public Usuario GetUserById(int id)
+        public Book GetBookById(int id)
         {
-            return _context.Usuarios.FirstOrDefault(u => u.PkUsuario == id  );
+            return _context.Books.FirstOrDefault(u => u.PkBook == id  );
         }
 
-        public bool CreateUser(Usuario request)
+        public bool CreateBook(Book request)
         {
             try
             {
-                Usuario usuario = new()
+                Book libro = new()
                 {
-                    Nombre = request.Nombre,
-                    UserName = request.UserName,
-                    Password = request.Password,
-                    FkRole = request.FkRole
+                    Titulo = request.Titulo,
+                    Descripcion = request.Descripcion,
+                    Autor = request.Autor,
+                    Img = request.Img,
+                    Categoria = request.Categoria,
                 };
-                _context.Usuarios.Add(usuario);
+                _context.Books.Add(libro);
                 int result = _context.SaveChanges();
-                if (result > 0) 
+                if (result > 0)
                 {
                     return true;
                 }
@@ -63,26 +62,26 @@ namespace VelazquezYahir.Services.Services
                 throw new Exception("sucedio un error al intentar crear el usuario" + ex.Message);
             }
         }
-        public bool UpdateUser(Usuario request)
+        public bool UpdateBook(Book request)
         {
             try
             {
-                _context.Usuarios.Update(request);
+                _context.Books.Update(request);
                 int result = _context.SaveChanges();
                 return result > 0;
             }
             catch (Exception ex)
             {
-                throw new Exception("Sucedio un error al intentar actualizar el usuario " + ex.Message);
+                throw new Exception("Sucedio un error al intentar actualizar el libro " + ex.Message);
             }
         }
 
-        public bool DeleteUser(int PkUsuario)
+        public bool DeleteBook(int PkBook)
         {
             try
             {
-                var user = GetUserById(PkUsuario);
-                _context.Usuarios.Remove(user);
+                var libro = GetBookById(PkBook);
+                _context.Books.Remove(libro);
                 int result = _context.SaveChanges();
                 return result > 0;
             }

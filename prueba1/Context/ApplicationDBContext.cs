@@ -8,6 +8,9 @@ namespace VelazquezYahir.Context
         public ApplicationDBContext(DbContextOptions<ApplicationDBContext> options) : base(options) { }
         public DbSet<Usuario> Usuarios { get; set; }
         public DbSet<Role> Roles { get; set; }
+        public DbSet<Book> Books { get; set; }
+        public DbSet<Categoria> Categorias { get; set; }
+
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
             modelBuilder.Entity<Usuario>().HasData(
@@ -26,7 +29,12 @@ namespace VelazquezYahir.Context
             {
                 PkRole = 1,
                 Nombre = "Admin"
-            }
+            },
+                   new Role
+                   {
+                       PkRole = 2,
+                       Nombre = "Usuario"
+                   }
             );
         }
     }
