@@ -37,7 +37,8 @@ namespace VelazquezYahir.Controllers
         }
 
         public IActionResult Editar(int id)
-        { 
+        {
+            ViewBag.Categorias = _categoriaService.GetCategorias();
             var libro = _bookService.GetBookById(id);
             return View(libro);
         }

@@ -1,72 +1,51 @@
 ﻿@model VelazquezYahir.Models.Domain.Usuario
 
-<div class="container-fluid">
-    <div class="offset-12">
-        <div class="card border">
-            <div class="card-header bg-dark">
-                <h1 class="text-white"><strong>Crear usuario</strong></h1>
-            </div>
+<div class="container-fluid mt-4">
+    <div class="row justify-content-center">
+        <div class="col-md-8">
+            <div class="card border shadow">
+                <div class="card-header text-center">
+                    <h1 class="mb-0"><strong>Crear Usuario</strong></h1>
+                </div>
+                <div class="card-body">
+                    <form asp-action="Crear" method="post" id="crearUsuarioForm">
+                        <div class="form-group">
+                            <label asp-for="Nombre" class="control-label"></label>
+                            <input asp-for="Nombre" class="form-control" placeholder="Ingresa el nombre" required />
+                            <span asp-validation-for="Nombre" class="text-danger"></span>
+                        </div>
 
-            <div class="card-body">
-                <form asp-action="Crear" method="post" id="crearUsuarioForm">
-                    <div class="form-group">
-                        <label asp-for="Nombre" class="control-label"></label>
-                        <input asp-for="Nombre" class="form-control" placeholder="Ingresa el nombre" required />
-                        <span asp-validation-for="Nombre" class="text-danger"></span>
+                        <div class="form-group">
+                            <label asp-for="UserName" class="control-label"></label>
+                            <input asp-for="UserName" class="form-control" placeholder="Ingresa el usuario" required />
+                            <span asp-validation-for="UserName" class="text-danger"></span>
+                        </div>
+
+                        <div class="form-group">
+                            <label asp-for="Password" class="control-label"></label>
+                            <input asp-for="Password" type="password" class="form-control" placeholder="Ingresa la contraseña" required />
+                            <span asp-validation-for="Password" class="text-danger"></span>
+                        </div>
+
+                        <div class="form-group">
+                            <label class="control-label">Rol</label>
+                            <select asp-for="FkRole" class="form-control" required>
+                                <option value="">Selecciona un rol</option>
+                                <option value="1">Admin</option>
+                                <option value="2">Usuario</option>
+                            </select>
+                            <span asp-validation-for="FkRole" class="text-danger"></span>
+                        </div>
+
+                        <div class="form-group mt-3 text-center">
+                            <button type="submit" class="btn btn-primary"><i class="bi bi-person-fill"></i> Guardar</button>
+                        </div>
+                    </form>
+                    <div class="text-center mt-3">
+                        <a asp-controller="User" asp-action="Index" class="btn btn-outline-secondary">Volver</a>
                     </div>
-
-                    <div class="form-group">
-                        <label asp-for="UserName" class="control-label"></label>
-                        <input asp-for="UserName" class="form-control" placeholder="Ingresa el usuario" required />
-                        <span asp-validation-for="UserName" class="text-danger"></span>
-                    </div>
-
-                    <div class="form-group">
-                        <label asp-for="Password" class="control-label"></label>
-                        <input asp-for="Password" type="password" class="form-control" placeholder="Ingresa la contraseña" required />
-                        <span asp-validation-for="Password" class="text-danger"></span>
-                    </div>
-
-                    <div class="form-group">
-                        <label class="control-label">Role</label>
-                        <select asp-for="FkRole" class="form-control" required>
-                            <option value="">Selecciona un rol</option>
-                            <option value="1">Admin</option>
-                            <option value="2">Usuario</option>
-                        </select>
-                        <span asp-validation-for="FkRole" class="text-danger"></span>
-                    </div>
-
-                    <div class="form-group mt-3">
-                        <button type="submit" class="btn btn-secondary d-block mx-auto"><i class="bi bi-person-fill"></i> Guardar</button>
-                    </div>
-                </form>
-
-                <a asp-controller="User" asp-action="Index" class="btn btn-outline-secondary">Volver</a>
+                </div>
             </div>
         </div>
     </div>
 </div>
-
-@section Scripts {
-    <script>
-        $(document).ready(function () {
-            $('#crearUsuarioForm').on('submit', function (e) {
-                e.preventDefault();
-                Swal.fire({
-                    title: '¿Estás seguro?',
-                    text: "¿Deseas crear este usuario?",
-                    icon: 'question',
-                    showCancelButton: true,
-                    confirmButtonColor: '#3085d6',
-                    cancelButtonColor: '#d33',
-                    confirmButtonText: 'Sí, crear'
-                }).then((result) => {
-                    if (result.isConfirmed) {
-                        this.submit();
-                    }
-                });
-            });
-        });
-    </script>
-}

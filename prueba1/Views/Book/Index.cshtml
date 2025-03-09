@@ -1,115 +1,111 @@
 ﻿@model IEnumerable<VelazquezYahir.Models.Domain.Book>
 @{
-	Layout = "_LayoutDashboard";
-
+    Layout = "_LayoutDashboard";
 }
-<h1>Libros</h1>
 
+<h1 class="text-center my-4">Libros</h1>
 
 <div class="container-fluid">
-	<div class="offset-12">
-		<div class="card border">
-			<div class="card-header">
-				<h2 class="">Lista de libros</h2>
-				<div>
-					<a asp-action="Crear" class="btn btn-success mx-auto btn-md">Crear Nuevo Libro</a>
-				</div>
-			</div>
-			<div class="card-body">
-
-				<table class="table table-primary table-striped table-hover">
-					<thead>
-						<tr>
-							<th>
-								@Html.DisplayNameFor(model => model.Titulo)
-							</th>
-							<th>
-								@Html.DisplayNameFor(model => model.Autor)
-							</th>
-							<th>
-								@Html.DisplayNameFor(model => model.Descripcion)
-							</th>
-							<th>
-								@Html.DisplayNameFor(model => model.Img)
-							</th>
-							<th>
-								@Html.DisplayNameFor(model => model.Categoria)
-							</th>
-
-							<th>Acciones</th>
-						</tr>
-					</thead>
-					<tbody>
-						@foreach (var item in Model)
-						{
-							<tr>
-								<td>
-									@Html.DisplayFor(modelItem => item.Titulo)
-								</td>
-								<td class="">
-									@Html.DisplayFor(modelItem => item.Autor)
-								</td>
-								<td>
-									@Html.DisplayFor(modelItem => item.Descripcion)
-								</td>
-								<td>
-									@Html.DisplayFor(modelItem => item.Img)
-								</td>
-								<td>
-									@Html.DisplayFor(modelItem => item.Categorias.Nombre)
-								</td>
-								<td>
-									<a asp-action="Editar" asp-route-id="@item.PkBook" class="btn btn-warning">Edit</a>
-									<a data-id="@item.PkBook" class="btn btn-danger eliminar-libro">Delete</a>
-								</td>
-							</tr>
-						}
-					</tbody>
-				</table>
-
-			</div>
-
-		</div>
-	</div>
+    <div class="card border shadow">
+        <div class="card-header d-flex justify-content-between align-items-center">
+            <h2 class="mb-0">Lista de libros</h2>
+            <a asp-action="Crear" class="btn btn-success">
+                <i class="fas fa-plus"></i> Crear Nuevo Libro
+            </a>
+        </div>
+        <div class="card-body">
+            @if (Model.Count() > 0)
+            {
+                <table class="table table-hover table-striped">
+                    <thead class="thead-dark">
+                        <tr>
+                            <th>@Html.DisplayNameFor(model => model.Titulo)</th>
+                            <th>@Html.DisplayNameFor(model => model.Autor)</th>
+                            <th>@Html.DisplayNameFor(model => model.Descripcion)</th>
+                            <th>@Html.DisplayNameFor(model => model.Img)</th>
+                            <th>@Html.DisplayNameFor(model => model.Categoria)</th>
+                            <th>Acciones</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @foreach (var item in Model)
+                        {
+                            <tr>
+                                <td>@Html.DisplayFor(modelItem => item.Titulo)</td>
+                                <td>@Html.DisplayFor(modelItem => item.Autor)</td>
+                                <td>@Html.DisplayFor(modelItem => item.Descripcion)</td>
+                                <td>@Html.DisplayFor(modelItem => item.Img)</td>
+                                <td>@Html.DisplayFor(modelItem => item.Categorias.Nombre)</td>
+                                <td>
+                                    <a asp-action="Editar" asp-route-id="@item.PkBook" class="btn btn-sm btn-outline-primary me-2">
+                                        <i class="bi bi-pencil-square"></i> Editar
+                                    </a>
+                                    <button data-id="@item.PkBook" class="btn btn-sm btn-outline-danger eliminar-libro">
+                                        <i class="bi bi-trash"></i> Eliminar
+                                    </button>
+                                </td>
+                            </tr>
+                        }
+                    </tbody>
+                </table>
+            }
+            else
+            {
+                <p>No hay libros</p>
+            }
+        </div>
+    </div>
 </div>
 
-
 @section Scripts {
-	<script>
-		$(document).ready(function () {
-			$('.eliminar-libro').on('click', function () {
-				Swal.fire({
-					title: "Esta seguro que deseas borrar?",
-					text: "No podrás revertir esto.!",
-					icon: "warning",
-					showCancelButton: true,
-					confirmButtonColor: "#3085d6",
-					cancelButtonColor: "#d33",
-					confirmButtonText: "Sí, deseo borrar!"
-				}).then((result) => {
-					if (result.isConfirmed) {
-						var bookid = $(this).data('id');
-						$.ajax({
-							url: '/Book/Eliminar/' + bookid,
-							type: 'DELETE',
-							success: function (data) {
-								console.log(data)
-
-								if (data.success == true) {
-									location.reload();
-								}
-							}
-						});
-						Swal.fire({
-							title: "Eliminando!",
-							text: "ha sido eliminado correctamente.",
-							icon: "success",
-							timer: 5000
-						});
-					}
-				});
-			});
-		});
-	</script>
+    <script>
+        $(document).ready(function () {
+            $('.eliminar-libro').on('click', function () {
+                var bookid = $(this).data('id');
+                Swal.fire({
+                    title: "¿Estás seguro?",
+                    text: "No podrás revertir esto.",
+                    icon: "warning",
+                    showCancelButton: true,
+                    confirmButtonColor: "#d33",
+                    cancelButtonColor: "#3085d6",
+                    confirmButtonText: "Sí, deseo borrarlo",
+                    cancelButtonText: "Cancelar"
+                }).then((result) => {
+                    if (result.isConfirmed) {
+                        $.ajax({
+                            url: '/Book/Eliminar/' + bookid,
+                            type: 'DELETE',
+                          success: function (response) {
+                                if (response.success) {
+                                    Swal.fire({
+                                        title: "¡Eliminado!",
+                                        text: "La categoría ha sido eliminada correctamente.",
+                                        icon: "success",
+                                        timer: 1500,
+                                        showConfirmButton: false
+                                    }).then(() => {
+                                        location.reload();
+                                    });
+                                } else {
+                                    Swal.fire({
+                                        title: "Error",
+                                        text: "No se pudo eliminar la categoría",
+                                        icon: "error"
+                                    });
+                                }
+                            },
+                            error: function () {
+                                Swal.fire({
+                                    title: "Error",
+                                    text: "Ocurrió un error al procesar la solicitud",
+                                    icon: "error"
+                                });
+                            }
+                        });
+                    }
+                });
+            });
+        });
+    </script>
 }
-
