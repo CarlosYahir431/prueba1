@@ -7,7 +7,7 @@
 namespace VelazquezYahir.Migrations
 {
     /// <inheritdoc />
-    public partial class prueba : Migration
+    public partial class pruebas1 : Migration
     {
         /// <inheritdoc />
         protected override void Up(MigrationBuilder migrationBuilder)
@@ -47,6 +47,7 @@ namespace VelazquezYahir.Migrations
                     Titulo = table.Column<string>(type: "nvarchar(max)", nullable: false),
                     Descripcion = table.Column<string>(type: "nvarchar(max)", nullable: false),
                     Autor = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    Img = table.Column<string>(type: "nvarchar(max)", nullable: false),
                     Categoria = table.Column<int>(type: "int", nullable: false)
                 },
                 constraints: table =>
@@ -82,6 +83,26 @@ namespace VelazquezYahir.Migrations
                         onDelete: ReferentialAction.Cascade);
                 });
 
+            migrationBuilder.CreateTable(
+                name: "Comentarios",
+                columns: table => new
+                {
+                    PkComentario = table.Column<int>(type: "int", nullable: false)
+                        .Annotation("SqlServer:Identity", "1, 1"),
+                    Comentarios = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    PkBook = table.Column<int>(type: "int", nullable: false)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_Comentarios", x => x.PkComentario);
+                    table.ForeignKey(
+                        name: "FK_Comentarios_Books_PkBook",
+                        column: x => x.PkBook,
+                        principalTable: "Books",
+                        principalColumn: "PkBook",
+                        onDelete: ReferentialAction.Cascade);
+                });
+
             migrationBuilder.InsertData(
                 table: "Roles",
                 columns: new[] { "PkRole", "Nombre" },
@@ -102,6 +123,11 @@ namespace VelazquezYahir.Migrations
                 column: "Categoria");
 
             migrationBuilder.CreateIndex(
+                name: "IX_Comentarios_PkBook",
+                table: "Comentarios",
+                column: "PkBook");
+
+            migrationBuilder.CreateIndex(
                 name: "IX_Usuarios_FkRole",
                 table: "Usuarios",
                 column: "FkRole");
@@ -111,16 +137,19 @@ namespace VelazquezYahir.Migrations
         protected override void Down(MigrationBuilder migrationBuilder)
         {
             migrationBuilder.DropTable(
-                name: "Books");
+                name: "Comentarios");
 
             migrationBuilder.DropTable(
                 name: "Usuarios");
 
             migrationBuilder.DropTable(
-                name: "Categorias");
+                name: "Books");
 
             migrationBuilder.DropTable(
                 name: "Roles");
+
+            migrationBuilder.DropTable(
+                name: "Categorias");
         }
     }
 }

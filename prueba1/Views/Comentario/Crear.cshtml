@@ -1,0 +1,40 @@
+﻿@model VelazquezYahir.Models.Domain.Comentario
+
+@{
+}
+
+<h1>Crear</h1>
+<h4>Comentario</h4>
+
+<hr />
+<div class="row">
+	<div class="col-md-4">
+		<form asp-action="Crear">
+			<div asp-validation-summary="ModelOnly" class="text-danger"></div>
+			<div class="form-group">
+				<label asp-for="Comentarios" class="control-label"></label>
+				<input asp-for="Comentarios" class="form-control" />
+				<span asp-validation-for="Comentarios" class="text-danger"></span>
+			</div>
+			<div class="form-group">
+				<label asp-for="Book" class="control-label">Libro</label>
+				<select asp-for="PkBook" class="form-control">
+					<option>Selecciona un Libro</option>
+					@foreach (var item in ViewBag.Books)
+					{
+						<option value="@item.PkBook">@item.Titulo</option>
+					}
+				</select>
+			</div>
+
+			<div class="form-group">
+				<input type="submit" value="Create" class="btn btn-primary" />
+			</div>
+		</form>
+	</div>
+</div>
+
+<div>
+	<a asp-action="Index">Back to List</a>
+</div>
+

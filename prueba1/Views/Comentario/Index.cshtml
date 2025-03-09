@@ -1,0 +1,98 @@
+﻿@model IEnumerable<VelazquezYahir.Models.Domain.Comentario>
+
+@{
+	Layout = "_LayoutDashboard";
+}
+
+<h1>Index</h1>
+
+<p>
+	<a asp-action="Crear" class="btn btn-success mx-auto btn-md">Create Nuevo Comentario</a>
+</p>
+<table class="table">
+	<thead>
+		<tr>
+			<th>
+				Libro
+			</th>
+			<th>
+				Comentario
+			</th>
+
+			<th>
+				Acciones
+			</th>
+		</tr>
+	</thead>
+	<tbody>
+		@foreach (var item in Model)
+		{
+			<tr>
+				<td>
+					@Html.DisplayFor(modelItem => item.Book.Titulo)
+				</td>
+				<td>
+					@Html.DisplayFor(modelItem => item.Comentarios)
+				</td>
+
+				<td>
+					<a asp-action="Editar" asp-route-id="@item.PkComentario">Editar</a>
+					<a class="btn btn-danger eliminar-comentario" data-id="@item.PkComentario"><i class="fa-solid fa-trash"></i> Eliminar</a>
+				</td>
+			</tr>
+		}
+	</tbody>
+</table>
+@section Scripts {
+	<script>
+		$(document).ready(function () {
+			$('.eliminar-comentario').on('click', function () {
+				//if (confirm('¿Estás seguro de que deseas eliminar este artículo?')) {}
+				Swal.fire({
+					title: "Esta seguro que deseas borrar el comentario?",
+					text: "No podrás revertir esto.!",
+					icon: "warning",
+
+					showCancelButton: true,
+					confirmButtonColor: "#3085d6",
+					cancelButtonColor: "#d33",
+					confirmButtonText: "Sí, deseo borrar!"
+				}).then((result) => {
+					if (result.isConfirmed) {
+
+						var comentarioid = $(this).data('id');
+
+						$.ajax({
+							url: '/Comentario/Eliminar/' + comentarioid,
+							type: 'DELETE',
+							success: function (data) {
+								console.log(data)
+
+								if (data.success == true) {
+									location.reload();
+								}
+
+							}
+						});
+
+
+						Swal.fire({
+							title: "Eliminando!",
+							text: "El comentario ha sido eliminado correctamente.",
+							icon: "success",
+							timer: 700
+						});
+					}
+				});
+
+			});
+
+		});
+
+
+
+
+
+
+	</script>
+}

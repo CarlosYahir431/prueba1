@@ -11,8 +11,8 @@ using VelazquezYahir.Context;
 namespace VelazquezYahir.Migrations
 {
     [DbContext(typeof(ApplicationDBContext))]
-    [Migration("20250305212545_prueba2")]
-    partial class prueba2
+    [Migration("20250309031242_pruebas1")]
+    partial class pruebas1
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -73,6 +73,28 @@ namespace VelazquezYahir.Migrations
                     b.HasKey("PkCategoria");
 
                     b.ToTable("Categorias");
+                });
+
+            modelBuilder.Entity("VelazquezYahir.Models.Domain.Comentario", b =>
+                {
+                    b.Property<int>("PkComentario")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("PkComentario"));
+
+                    b.Property<string>("Comentarios")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<int>("PkBook")
+                        .HasColumnType("int");
+
+                    b.HasKey("PkComentario");
+
+                    b.HasIndex("PkBook");
+
+                    b.ToTable("Comentarios");
                 });
 
             modelBuilder.Entity("VelazquezYahir.Models.Domain.Role", b =>
@@ -153,6 +175,17 @@ namespace VelazquezYahir.Migrations
                         .IsRequired();
 
                     b.Navigation("Categorias");
+                });
+
+            modelBuilder.Entity("VelazquezYahir.Models.Domain.Comentario", b =>
+                {
+                    b.HasOne("VelazquezYahir.Models.Domain.Book", "Book")
+                        .WithMany()
+                        .HasForeignKey("PkBook")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("Book");
                 });
 
             modelBuilder.Entity("VelazquezYahir.Models.Domain.Usuario", b =>
