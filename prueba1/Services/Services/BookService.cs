@@ -41,6 +41,7 @@ namespace VelazquezYahir.Services.Services
         {
             try
             {
+
                 Book libro = new()
                 {
                     Titulo = request.Titulo,
@@ -49,6 +50,7 @@ namespace VelazquezYahir.Services.Services
                     Img = request.Img,
                     Categoria = request.Categoria,
                 };
+
                 _context.Books.Add(libro);
                 int result = _context.SaveChanges();
                 if (result > 0)
