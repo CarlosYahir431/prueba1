@@ -16,21 +16,28 @@ namespace VelazquezYahir.Attributes
         public void OnAuthorization(AuthorizationFilterContext context)
         {
             var userId = context.HttpContext.Items["UserId"];
-            var userRole = context.HttpContext.Items["Role"];
+            var userRole = context.HttpContext.Items["Role"]?.ToString();
 
             if (userId == null)
             {
                 // No autenticado, redirigir a login
-                context.Result = new RedirectToActionResult("Login", "Auth", null);
+                if (context.HttpContext.Request.Path.StartsWithSegments("/api"))
+                {
+                    context.Result = new UnauthorizedResult(); // 401 para APIs
+                }
+                else
+                {
+                    context.Result = new RedirectToActionResult("Login", "Auth", null);
+                }
                 return;
             }
 
-            // Verificar si el rol del usuario está entre los roles permitidos
-            if (_roles.Length > 0 && !_roles.Contains(userRole?.ToString()))
+            // Verificar si el rol del usuario está entre los permitidos (ignorando mayúsculas/minúsculas)
+            if (_roles.Length > 0 && !_roles.Any(r => string.Equals(r, userRole, StringComparison.OrdinalIgnoreCase)))
             {
-                // No autorizado para acceder a este recurso
-                context.Result = new ForbidResult();
+                context.Result = new ForbidResult(); // 403 Forbidden
             }
         }
+
     }
 }

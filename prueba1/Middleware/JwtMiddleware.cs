@@ -41,44 +41,43 @@ namespace VelazquezYahir.Middleware
                     IssuerSigningKey = new SymmetricSecurityKey(key),
                     ValidateIssuer = false,
                     ValidateAudience = false,
-                    RequireExpirationTime = true, // Asegurar que el token tiene fecha de expiración
-                    ValidateLifetime = true, // Validar la vida del token
+                    RequireExpirationTime = true,
+                    ValidateLifetime = true,
                     ClockSkew = TimeSpan.Zero
                 };
 
                 var principal = tokenHandler.ValidateToken(token, validationParameters, out SecurityToken validatedToken);
                 var jwtToken = (JwtSecurityToken)validatedToken;
 
-                // Obtener claims del token
-                var userIdClaim = jwtToken.Claims.FirstOrDefault(x => x.Type == "nameid")?.Value
-                                  ?? jwtToken.Claims.FirstOrDefault(x => x.Type == "sub")?.Value; // Fallback al claim `sub`
+                // Obtener claims con métodos estándar
+                var userId = principal.FindFirstValue(ClaimTypes.NameIdentifier) ?? principal.FindFirstValue("sub");
+                var userRole = principal.FindFirstValue(ClaimTypes.Role);
 
-                var roleClaim = jwtToken.Claims.FirstOrDefault(x => x.Type == "role")?.Value;
-
-                if (!string.IsNullOrEmpty(userIdClaim))
+                if (!string.IsNullOrEmpty(userId))
                 {
-                    context.Items["UserId"] = userIdClaim;
+                    context.Items["UserId"] = userId;
                 }
 
-                if (!string.IsNullOrEmpty(roleClaim))
+                if (!string.IsNullOrEmpty(userRole))
                 {
-                    context.Items["Role"] = roleClaim;
+                    context.Items["Role"] = userRole;
                 }
 
                 // Establecer el usuario autenticado en HttpContext.User
-                var claimsIdentity = new ClaimsIdentity(principal.Claims, "jwt");
-                context.User = new ClaimsPrincipal(claimsIdentity);
+                context.User = new ClaimsPrincipal(new ClaimsIdentity(principal.Claims, "jwt"));
             }
             catch (SecurityTokenExpiredException)
             {
-                // Si el token expiró, lo eliminamos de las cookies para evitar problemas
+                // Eliminar cookie si el token expiró
                 context.Response.Cookies.Delete("AuthToken");
             }
-            catch
+            catch (Exception ex)
             {
-                // Si hay algún otro error en la validación del token, el middleware sigue sin usuario autenticado
+                // Loggear error para depuración
+                Console.WriteLine($"JWT Validation Error: {ex.Message}");
             }
         }
+
     }
 
     // Extensión para registrar el middleware

@@ -11,7 +11,7 @@ using VelazquezYahir.Context;
 namespace VelazquezYahir.Migrations
 {
     [DbContext(typeof(ApplicationDBContext))]
-    [Migration("20250312065849_prueba")]
+    [Migration("20250312151715_prueba")]
     partial class prueba
     {
         /// <inheritdoc />

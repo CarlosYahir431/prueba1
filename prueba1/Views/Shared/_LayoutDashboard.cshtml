@@ -247,16 +247,17 @@
 			</div>
 
 			<div class="sidebar-nav">
-				
 				<a asp-controller="User" asp-action="Index"><i class="bi bi-house"></i><span>Usuarios</span></a>
 				<a asp-controller="Book" asp-action="Index"><i class="bi bi-book"></i><span>Libros</span></a>
 				<a asp-controller="Categoria" asp-action="Index"><i class="bi bi-tag"></i><span>Categorias</span></a>
 				<a asp-controller="Comentario" asp-action="Index"><i class="bi bi-chat"></i><span>Comentarios</span></a>
 
-
-				<a asp-controller="UsuarioVerdadero" asp-action="Index"><i class="bi bi-chat"></i><span>Inicio</span></a>
-
+				@if (User.Identity.IsAuthenticated && User.FindFirst(System.Security.Claims.ClaimTypes.NameIdentifier)?.Value == "2")
+				{
+					<a asp-controller="UsuarioVerdadero" asp-action="Index"><i class="bi bi-chat"></i><span>Inicio</span></a>
+				}
 			</div>
+
 		</nav>
 
 		<!-- Page Content -->

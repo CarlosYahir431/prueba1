@@ -39,7 +39,7 @@ namespace VelazquezYahir.Controllers
                 .Where(c => c.PkBook == id)
                 .Select(c => new ComentarioViewModel
                 {
-                    UsuarioNombre = c.Usuario != null ? c.Usuario.Nombre : "Anónimo",
+                    UsuarioNombre = _userService.GetUserById(c.PkUsuario)?.Nombre ?? "Anónimo",
                     ComentarioTexto = c.Comentarios
                 })
                 .ToList();
@@ -54,43 +54,35 @@ namespace VelazquezYahir.Controllers
         }
 
         [HttpPost]
-        public IActionResult AgregarComentario(BookDetailViewModel model, int id, int userId)
+        [ValidateAntiForgeryToken]
+        public IActionResult AgregarComentario(BookDetailViewModel model, int UserId)
         {
-            if (!ModelState.IsValid)
+            if (ModelState.IsValid)
             {
-                return RedirectToAction("Details", new { id });
+                var usuario = _userService.GetUserById(UserId); // Obtener usuario autenticado
+                if (usuario == null)
+                {
+                    ModelState.AddModelError("", "No se encontró el usuario.");
+                    return RedirectToAction("Details", new { id = model.Book.PkBook });
+                }
+
+                Comentario nuevoComentario = new Comentario
+                {
+                    PkBook = model.Book.PkBook,
+                    Comentarios = model.NuevoComentario,
+                    PkUsuario = usuario.PkUsuario
+                };
+
+                bool resultado = _comentarioService.CreateComentario(nuevoComentario);
+
+                if (!resultado)
+                {
+                    ModelState.AddModelError("", "Error al guardar el comentario.");
+                }
             }
 
-            if (userId <= 0)
-            {
-                ModelState.AddModelError("", "No se pudo identificar al usuario.");
-                return RedirectToAction("Details", new { id });
-            }
-
-            var usuario = _userService.GetUserById(userId);
-            if (usuario == null)
-            {
-                ModelState.AddModelError("", "Usuario no encontrado.");
-                return RedirectToAction("Details", new { id });
-            }
-
-            Comentario nuevoComentario = new Comentario
-            {
-                PkBook = id,
-                Comentarios = model.NuevoComentario,
-                PkUsuario = usuario.PkUsuario
-            };
-
-            bool resultado = _comentarioService.CreateComentario(nuevoComentario);
-
-            if (!resultado)
-            {
-                ModelState.AddModelError("", "Error al guardar el comentario.");
-            }
-
-            return RedirectToAction("Details", new { id });
+            return RedirectToAction("Details", new { id = model.Book.PkBook });
         }
-
 
 
         // GET: UsuarioVerdaderoController/Create

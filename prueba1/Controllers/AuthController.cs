@@ -36,30 +36,28 @@ namespace VelazquezYahir.Controllers
                 return View(model);
             }
 
-            // Guardar el token en una cookie segura
-            HttpContext.Response.Cookies.Append("AuthToken", token, new CookieOptions
-            {
-                HttpOnly = true,
-                Secure = true, // En producción, establecer en true
-                SameSite = SameSiteMode.Strict,
-                Expires = DateTimeOffset.UtcNow.AddDays(7)
-            });
-
-            // Obtener información del usuario autenticado
             var user = _authService.GetUserByUsername(model.Username);
-
             if (user == null)
             {
                 ModelState.AddModelError(string.Empty, "Error al obtener la información del usuario.");
                 return View(model);
             }
 
-            // **Autenticar al usuario en ASP.NET Core**
+            // **Almacenar el token JWT en una cookie segura**
+            HttpContext.Response.Cookies.Append("AuthToken", token, new CookieOptions
+            {
+                HttpOnly = true,
+                Secure = true, // Solo en HTTPS
+                SameSite = SameSiteMode.Strict,
+                Expires = DateTimeOffset.UtcNow.AddDays(7)
+            });
+
+            // **Autenticar en el sistema de ASP.NET Core**
             var claims = new List<Claim>
             {
                 new Claim(ClaimTypes.Name, user.UserName),
                 new Claim(ClaimTypes.NameIdentifier, user.PkUsuario.ToString()),
-                new Claim(ClaimTypes.Role, user.FkRole.ToString())
+                new Claim(ClaimTypes.Role, user.FkRole.ToString()) // Se recomienda usar Enum para roles
             };
 
             var claimsIdentity = new ClaimsIdentity(claims, "Cookies");
@@ -70,7 +68,7 @@ namespace VelazquezYahir.Controllers
 
             await HttpContext.SignInAsync("Cookies", new ClaimsPrincipal(claimsIdentity), authProperties);
 
-            // Redirección basada en rol
+            // **Redirección basada en rol**
             return user.FkRole switch
             {
                 1 => RedirectToAction("Index", "User"),
@@ -91,12 +89,15 @@ namespace VelazquezYahir.Controllers
             if (!ModelState.IsValid)
                 return View(model);
 
+            // **Hashear la contraseña antes de guardarla**
+            var hashedPassword = _authService.HashPassword(model.Password);
+
             var usuario = new Usuario
             {
                 UserName = model.Username,
-                Password = model.Password,
+                Password = hashedPassword, // Guardar el password hasheado
                 FkRole = model.Role,
-                Nombre = model.Nombre  // Ahora asignas el nombre desde el campo independiente
+                Nombre = model.Nombre
             };
 
             if (_authService.RegisterUser(usuario))
@@ -111,14 +112,13 @@ namespace VelazquezYahir.Controllers
         [HttpPost]
         public async Task<IActionResult> Logout()
         {
-            // Eliminar la cookie de autenticación
+            // **Eliminar la cookie del token**
             HttpContext.Response.Cookies.Delete("AuthToken");
 
-            // Cerrar sesión en ASP.NET Core
+            // **Cerrar sesión**
             await HttpContext.SignOutAsync("Cookies");
 
             return RedirectToAction("Login");
         }
-
     }
 }

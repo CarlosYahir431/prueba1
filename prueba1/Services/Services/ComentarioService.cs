@@ -20,7 +20,7 @@ namespace VelazquezYahir.Services.Services
             {
                 return _context.Comentarios
                     .Include(c => c.Book)
-                    .Include(c => c.Usuario) // Asegurar que se incluya el usuario
+                    .Include(c => c.PkUsuario) // Asegurar que se incluya el usuario
                     .ToList();
             }
             catch (SqlException ex)

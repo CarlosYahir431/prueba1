@@ -15,13 +15,12 @@ namespace VelazquezYahir.Services.Services
 
         public AuthenticationService(IUserService userService, IConfiguration configuration)
         {
-            _userService = userService; 
+            _userService = userService;
             _configuration = configuration;
         }
 
         public bool RegisterUser(Usuario usuario)
         {
-            // Hash de la contraseña antes de guardarla
             usuario.Password = HashPassword(usuario.Password);
             return _userService.CreateUserverdadero(usuario);
         }
@@ -29,15 +28,9 @@ namespace VelazquezYahir.Services.Services
         public string? Authenticate(string username, string password)
         {
             var user = _userService.GetUsers().FirstOrDefault(u => u.UserName == username);
-
-            if (user == null)
+            if (user == null || !VerifyPassword(password, user.Password))
                 return null;
 
-            // Verificar contraseña hasheada
-            if (!VerifyPassword(password, user.Password))
-                return null;
-
-            // Generar token JWT
             return GenerateJwtToken(user);
         }
 
@@ -49,17 +42,22 @@ namespace VelazquezYahir.Services.Services
         private string GenerateJwtToken(Usuario user)
         {
             var key = Encoding.ASCII.GetBytes(_configuration["Jwt:Key"] ?? throw new InvalidOperationException("JWT Key not configured"));
+            var issuer = _configuration["Jwt:Issuer"];
+            var audience = _configuration["Jwt:Audience"];
 
             var claims = new List<Claim>
             {
                 new Claim(ClaimTypes.Name, user.UserName),
                 new Claim(ClaimTypes.NameIdentifier, user.PkUsuario.ToString()),
+                new Claim(ClaimTypes.Role, user.FkRole.ToString()) // Agregar rol del usuario
             };
 
             var tokenDescriptor = new SecurityTokenDescriptor
             {
                 Subject = new ClaimsIdentity(claims),
                 Expires = DateTime.UtcNow.AddDays(1),
+                Issuer = issuer,
+                Audience = audience,
                 SigningCredentials = new SigningCredentials(new SymmetricSecurityKey(key), SecurityAlgorithms.HmacSha256Signature)
             };
 
@@ -70,57 +68,34 @@ namespace VelazquezYahir.Services.Services
 
         private string HashPassword(string password)
         {
-            // Usando PBKDF2 para hashear la contraseña
+            using var rng = RandomNumberGenerator.Create();
             byte[] salt = new byte[16];
-            using (var rng = RandomNumberGenerator.Create())
-            {
-                rng.GetBytes(salt);
-            }
+            rng.GetBytes(salt);
 
-            var pbkdf2 = new Rfc2898DeriveBytes(password, salt, 10000, HashAlgorithmName.SHA256);
-            byte[] hash = pbkdf2.GetBytes(20);
+            using var pbkdf2 = new Rfc2898DeriveBytes(password, salt, 10000, HashAlgorithmName.SHA256);
+            byte[] hash = pbkdf2.GetBytes(32);
 
-            byte[] hashBytes = new byte[36];
-            Array.Copy(salt, 0, hashBytes, 0, 16);
-            Array.Copy(hash, 0, hashBytes, 16, 20);
-
-            return Convert.ToBase64String(hashBytes);
+            return $"{Convert.ToBase64String(salt)}:{Convert.ToBase64String(hash)}";
         }
 
         private bool VerifyPassword(string password, string storedHash)
         {
             try
             {
-                // Verificar que el hash no sea nulo o vacío
-                if (string.IsNullOrEmpty(storedHash))
+                var parts = storedHash.Split(':');
+                if (parts.Length != 2)
                     return false;
 
-                byte[] hashBytes = Convert.FromBase64String(storedHash);
+                byte[] salt = Convert.FromBase64String(parts[0]);
+                byte[] storedPasswordHash = Convert.FromBase64String(parts[1]);
 
-                // Verificar que el hash tenga la longitud correcta
-                if (hashBytes.Length != 36)
-                    return false;
+                using var pbkdf2 = new Rfc2898DeriveBytes(password, salt, 10000, HashAlgorithmName.SHA256);
+                byte[] computedHash = pbkdf2.GetBytes(32);
 
-                byte[] salt = new byte[16];
-                Array.Copy(hashBytes, 0, salt, 0, 16);
-                var pbkdf2 = new Rfc2898DeriveBytes(password, salt, 10000, HashAlgorithmName.SHA256);
-                byte[] hash = pbkdf2.GetBytes(20);
-
-                for (int i = 0; i < 20; i++)
-                {
-                    if (hashBytes[i + 16] != hash[i])
-                        return false;
-                }
-                return true;
+                return storedPasswordHash.SequenceEqual(computedHash);
             }
             catch (FormatException)
             {
-                // Log error si es necesario
-                return false;
-            }
-            catch (Exception)
-            {
-                // Log error si es necesario
                 return false;
             }
         }
