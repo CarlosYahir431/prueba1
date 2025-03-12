@@ -63,6 +63,30 @@ namespace VelazquezYahir.Services.Services
                 throw new Exception("sucedio un error al intentar crear el usuario" + ex.Message);
             }
         }
+        public bool CreateUserverdadero(Usuario request)
+        {
+            try
+            {
+                Usuario usuario = new()
+                {
+                    Nombre = request.Nombre,
+                    UserName = request.UserName,
+                    Password = request.Password,
+                    FkRole = request.FkRole = 2
+                };
+                _context.Usuarios.Add(usuario);
+                int result = _context.SaveChanges();
+                if (result > 0)
+                {
+                    return true;
+                }
+                return false;
+            }
+            catch (Exception ex)
+            {
+                throw new Exception("sucedio un error al intentar crear el usuario" + ex.Message);
+            }
+        }
         public bool UpdateUser(Usuario request)
         {
             try

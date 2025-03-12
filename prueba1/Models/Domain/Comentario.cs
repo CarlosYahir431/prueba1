@@ -11,5 +11,7 @@ namespace VelazquezYahir.Models.Domain
         [ForeignKey("Book")]
         public required int PkBook { get; set; }
         public Book Book { get; set; }
+        public int PkUsuario { get; set; }
+        public Usuario Usuario { get; set; }
     }
 }

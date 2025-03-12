@@ -1,4 +1,5 @@
 ﻿using Azure.Core;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using VelazquezYahir.Models.Domain;
 using VelazquezYahir.Services.IServices;
@@ -17,6 +18,7 @@ namespace VelazquezYahir.Controllers
             _categoriaService = categoriaService;
         }
 
+
         [HttpGet]
         public IActionResult Index()
         {
@@ -28,14 +30,12 @@ namespace VelazquezYahir.Controllers
             ViewBag.Categorias = _categoriaService.GetCategorias();
             return View();
         }
-
         [HttpPost]
         public IActionResult Crear(Book libro)
         {
             _bookService.CreateBook(libro);
             return RedirectToAction("Index");
         }
-
         public IActionResult Editar(int id)
         {
             ViewBag.Categorias = _categoriaService.GetCategorias();

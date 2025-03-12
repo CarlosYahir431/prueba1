@@ -11,8 +11,8 @@ using VelazquezYahir.Context;
 namespace VelazquezYahir.Migrations
 {
     [DbContext(typeof(ApplicationDBContext))]
-    [Migration("20250309031242_pruebas1")]
-    partial class pruebas1
+    [Migration("20250312065849_prueba")]
+    partial class prueba
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -90,9 +90,17 @@ namespace VelazquezYahir.Migrations
                     b.Property<int>("PkBook")
                         .HasColumnType("int");
 
+                    b.Property<int>("PkUsuario")
+                        .HasColumnType("int");
+
+                    b.Property<int>("UsuarioPkUsuario")
+                        .HasColumnType("int");
+
                     b.HasKey("PkComentario");
 
                     b.HasIndex("PkBook");
+
+                    b.HasIndex("UsuarioPkUsuario");
 
                     b.ToTable("Comentarios");
                 });
@@ -185,7 +193,15 @@ namespace VelazquezYahir.Migrations
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
+                    b.HasOne("VelazquezYahir.Models.Domain.Usuario", "Usuario")
+                        .WithMany()
+                        .HasForeignKey("UsuarioPkUsuario")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
                     b.Navigation("Book");
+
+                    b.Navigation("Usuario");
                 });
 
             modelBuilder.Entity("VelazquezYahir.Models.Domain.Usuario", b =>

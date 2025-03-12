@@ -87,9 +87,17 @@ namespace VelazquezYahir.Migrations
                     b.Property<int>("PkBook")
                         .HasColumnType("int");
 
+                    b.Property<int>("PkUsuario")
+                        .HasColumnType("int");
+
+                    b.Property<int>("UsuarioPkUsuario")
+                        .HasColumnType("int");
+
                     b.HasKey("PkComentario");
 
                     b.HasIndex("PkBook");
+
+                    b.HasIndex("UsuarioPkUsuario");
 
                     b.ToTable("Comentarios");
                 });
@@ -182,7 +190,15 @@ namespace VelazquezYahir.Migrations
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
+                    b.HasOne("VelazquezYahir.Models.Domain.Usuario", "Usuario")
+                        .WithMany()
+                        .HasForeignKey("UsuarioPkUsuario")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
                     b.Navigation("Book");
+
+                    b.Navigation("Usuario");
                 });
 
             modelBuilder.Entity("VelazquezYahir.Models.Domain.Usuario", b =>

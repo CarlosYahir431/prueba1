@@ -1,4 +1,5 @@
-﻿using Microsoft.AspNetCore.Http;
+﻿using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using VelazquezYahir.Models.Domain;
 using VelazquezYahir.Services.IServices;
@@ -26,24 +27,6 @@ namespace VelazquezYahir.Controllers
         {
             ViewBag.Books = _BookService.GetBooks();
             return View();
-        }
-        [HttpPost]
-        public IActionResult Crear(Comentario Comentario)
-        {
-            _ComentarioService.CreateComentario(Comentario);
-            return RedirectToAction("Index");
-        }
-        public IActionResult Editar(int id)
-        {
-            ViewBag.Books = _BookService.GetBooks();
-            var Comentario = _ComentarioService.GetComentarioById(id);
-            return View(Comentario);
-        }
-        [HttpPost]
-        public IActionResult Editar(Comentario Comentario)
-        {
-            _ComentarioService.UpdateComentario(Comentario);
-            return RedirectToAction("Index");
         }
         [HttpDelete]
         public IActionResult Eliminar(int id)

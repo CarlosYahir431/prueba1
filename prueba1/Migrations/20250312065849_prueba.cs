@@ -7,7 +7,7 @@
 namespace VelazquezYahir.Migrations
 {
     /// <inheritdoc />
-    public partial class pruebas1 : Migration
+    public partial class prueba : Migration
     {
         /// <inheritdoc />
         protected override void Up(MigrationBuilder migrationBuilder)
@@ -90,7 +90,9 @@ namespace VelazquezYahir.Migrations
                     PkComentario = table.Column<int>(type: "int", nullable: false)
                         .Annotation("SqlServer:Identity", "1, 1"),
                     Comentarios = table.Column<string>(type: "nvarchar(max)", nullable: false),
-                    PkBook = table.Column<int>(type: "int", nullable: false)
+                    PkBook = table.Column<int>(type: "int", nullable: false),
+                    PkUsuario = table.Column<int>(type: "int", nullable: false),
+                    UsuarioPkUsuario = table.Column<int>(type: "int", nullable: false)
                 },
                 constraints: table =>
                 {
@@ -100,6 +102,12 @@ namespace VelazquezYahir.Migrations
                         column: x => x.PkBook,
                         principalTable: "Books",
                         principalColumn: "PkBook",
+                        onDelete: ReferentialAction.Cascade);
+                    table.ForeignKey(
+                        name: "FK_Comentarios_Usuarios_UsuarioPkUsuario",
+                        column: x => x.UsuarioPkUsuario,
+                        principalTable: "Usuarios",
+                        principalColumn: "PkUsuario",
                         onDelete: ReferentialAction.Cascade);
                 });
 
@@ -128,6 +136,11 @@ namespace VelazquezYahir.Migrations
                 column: "PkBook");
 
             migrationBuilder.CreateIndex(
+                name: "IX_Comentarios_UsuarioPkUsuario",
+                table: "Comentarios",
+                column: "UsuarioPkUsuario");
+
+            migrationBuilder.CreateIndex(
                 name: "IX_Usuarios_FkRole",
                 table: "Usuarios",
                 column: "FkRole");
@@ -140,16 +153,16 @@ namespace VelazquezYahir.Migrations
                 name: "Comentarios");
 
             migrationBuilder.DropTable(
-                name: "Usuarios");
-
-            migrationBuilder.DropTable(
                 name: "Books");
 
             migrationBuilder.DropTable(
-                name: "Roles");
+                name: "Usuarios");
 
             migrationBuilder.DropTable(
                 name: "Categorias");
+
+            migrationBuilder.DropTable(
+                name: "Roles");
         }
     }
 }

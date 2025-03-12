@@ -1,0 +1,76 @@
+﻿@model VelazquezYahir.Models.ViewModels.BookDetailViewModel
+
+<div class="container py-5">
+	<h1 class="mb-4 text-center text-primary fw-bold">Detalles del Libro</h1>
+
+	<div class="card shadow-lg border-0 rounded-4 overflow-hidden">
+		<div class="row g-0">
+			<div class="col-md-4 bg-light d-flex align-items-center justify-content-center p-4">
+				<img src="@Model.Book.Img" class="img-fluid rounded shadow" alt="@Model.Book.Titulo" style="max-height: 400px; width: auto;">
+			</div>
+			<div class="col-md-8">
+				<div class="card-body p-4">
+					<h3 class="card-title text-dark fw-bold">@Model.Book.Titulo</h3>
+					<div class="mb-3">
+						<span class="badge bg-primary fs-6 p-2">@Model.Book.Categoria</span>
+					</div>
+					<div class="mb-3">
+						<p class="text-muted mb-1 fw-semibold"><i class="fas fa-user me-2 text-primary"></i>Autor:</p>
+						<p class="fs-5 text-dark">@Model.Book.Autor</p>
+					</div>
+					<div class="mb-3">
+						<p class="text-muted mb-1 fw-semibold"><i class="fas fa-align-left me-2 text-primary"></i>Descripción:</p>
+						<p class="fs-6 text-dark">@Model.Book.Descripcion</p>
+					</div>
+				</div>
+			</div>
+		</div>
+	</div>
+
+	<!-- Sección de Comentarios -->
+	<div class="mt-5">
+		<h3 class="text-primary fw-bold">Comentarios</h3>
+		@if (Model.Comentarios.Any())
+		{
+			<ul class="list-group">
+				@foreach (var comentario in Model.Comentarios)
+				{
+					<li class="list-group-item">
+						<p class="mb-1"><strong>@comentario.UsuarioNombre:</strong></p>
+						<p class="text-muted">@comentario.ComentarioTexto</p>
+					</li>
+				}
+			</ul>
+		}
+		else
+		{
+			<p class="text-muted">No hay comentarios aún.</p>
+		}
+	</div>
+
+	<!-- Formulario para agregar un comentario -->
+	<div class="mt-4">
+		<h4 class="text-primary">Añadir un comentario</h4>
+
+		<form asp-action="AgregarComentario" asp-route-id="@Model.Book.PkBook" method="post">
+			<input type="hidden" name="UserId" value="@User.FindFirst(System.Security.Claims.ClaimTypes.NameIdentifier)?.Value?.ToString()" />
+
+			<div class="mb-3">
+				<label for="NuevoComentario" class="form-label">Escribe tu comentario:</label>
+				<textarea asp-for="NuevoComentario" class="form-control" rows="2"></textarea>
+				<span asp-validation-for="NuevoComentario" class="text-danger"></span>
+			</div>
+
+			<button type="submit" class="btn btn-primary">Publicar Comentario</button>
+		</form>
+
+
+	</div>
+
+	<!-- Botón de regreso -->
+	<div class="text-center mt-4">
+		<a asp-action="Index" class="btn btn-lg btn-primary shadow-sm rounded-pill px-4">
+			<i class="fas fa-arrow-left me-2"></i>Volver a la lista
+		</a>
+	</div>
+</div>

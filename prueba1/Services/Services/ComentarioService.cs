@@ -18,7 +18,10 @@ namespace VelazquezYahir.Services.Services
         {
             try
             {
-                return _context.Comentarios.Include(x => x.Book).ToList();
+                return _context.Comentarios
+                    .Include(c => c.Book)
+                    .Include(c => c.Usuario) // Asegurar que se incluya el usuario
+                    .ToList();
             }
             catch (SqlException ex)
             {
@@ -29,6 +32,7 @@ namespace VelazquezYahir.Services.Services
                 throw new Exception("Ocurrió un error inesperado: " + ex.Message);
             }
         }
+
         public Comentario GetComentarioById(int id)
         {
             return _context.Comentarios.FirstOrDefault(u => u.PkComentario == id);
@@ -42,6 +46,7 @@ namespace VelazquezYahir.Services.Services
                 {
                     PkBook = request.PkBook,
                     Comentarios = request.Comentarios,
+                    PkUsuario = request.PkUsuario
                 };
                 _context.Comentarios.Add(comentario);
                 int result = _context.SaveChanges();

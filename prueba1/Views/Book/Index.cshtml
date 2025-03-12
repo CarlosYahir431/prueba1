@@ -34,7 +34,7 @@
                                 <td>@Html.DisplayFor(modelItem => item.Titulo)</td>
                                 <td>@Html.DisplayFor(modelItem => item.Autor)</td>
                                 <td>@Html.DisplayFor(modelItem => item.Descripcion)</td>
-                                <td>@Html.DisplayFor(modelItem => item.Img)</td>
+                                <td><img src="@item.Img" style="width:50px; height:auto;"/></td>
                                 <td>@Html.DisplayFor(modelItem => item.Categorias.Nombre)</td>
                                 <td>
                                     <a asp-action="Editar" asp-route-id="@item.PkBook" class="btn btn-sm btn-outline-primary me-2">

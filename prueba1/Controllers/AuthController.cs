@@ -1,71 +1,124 @@
-﻿using Microsoft.AspNetCore.Mvc;
-using Microsoft.IdentityModel.Tokens;
-using System.IdentityModel.Tokens.Jwt;
+﻿using Microsoft.AspNetCore.Authentication;
 using System.Security.Claims;
-using System.Text;
+using Microsoft.AspNetCore.Mvc;
 using VelazquezYahir.Models.Domain;
-using VelazquezYahir.Services.IServices;
+using VelazquezYahir.Models.ViewModels;
+using Microsoft.AspNetCore.Authorization;
 
 namespace VelazquezYahir.Controllers
 {
-    [ApiController]
-    [Route("api/[controller]")]
-    public class AuthController : ControllerBase
+    public class AuthController : Controller
     {
-        private readonly IUserService _userService;
-        private readonly IConfiguration _configuration;
+        private readonly VelazquezYahir.Services.IServices.IAuthenticationService _authService;
 
-        public AuthController(IUserService userService, IConfiguration configuration)
+        public AuthController(VelazquezYahir.Services.IServices.IAuthenticationService authService)
         {
-            _userService = userService;
-            _configuration = configuration;
+            _authService = authService;
         }
 
-        [HttpPost("register")]
-        public IActionResult Register(Usuario usuario)
+        [HttpGet]
+        public IActionResult Login()
         {
-            if (_userService.CreateUser(usuario))
+            return View();
+        }
+
+        [HttpPost]
+        public async Task<IActionResult> Login(LoginViewModel model)
+        {
+            if (!ModelState.IsValid)
+                return View(model);
+
+            var token = _authService.Authenticate(model.Username, model.Password);
+
+            if (token == null)
             {
-                return Ok(new { Message = "Usuario registrado exitosamente" });
+                ModelState.AddModelError(string.Empty, "Nombre de usuario o contraseña incorrectos.");
+                return View(model);
             }
-            return BadRequest(new { Message = "Error al registrar el usuario" });
-        }
 
-        [HttpPost("login")]
-        public IActionResult Login(string username, string password)
-        {
-            var user = _userService.GetUsers().FirstOrDefault(u => u.UserName == username && u.Password == password);
+            // Guardar el token en una cookie segura
+            HttpContext.Response.Cookies.Append("AuthToken", token, new CookieOptions
+            {
+                HttpOnly = true,
+                Secure = true, // En producción, establecer en true
+                SameSite = SameSiteMode.Strict,
+                Expires = DateTimeOffset.UtcNow.AddDays(7)
+            });
+
+            // Obtener información del usuario autenticado
+            var user = _authService.GetUserByUsername(model.Username);
+
             if (user == null)
             {
-                return Unauthorized();
+                ModelState.AddModelError(string.Empty, "Error al obtener la información del usuario.");
+                return View(model);
             }
 
-            var token = GenerateJwtToken(user);
-            return Ok(new { Token = token });
-        }
-
-        private string GenerateJwtToken(Usuario usuario)
-        {
-            var claims = new[]
+            // **Autenticar al usuario en ASP.NET Core**
+            var claims = new List<Claim>
             {
-                new Claim(JwtRegisteredClaimNames.Sub, usuario.UserName),
-                new Claim(JwtRegisteredClaimNames.Jti, Guid.NewGuid().ToString()),
-                new Claim(ClaimTypes.NameIdentifier, usuario.PkUsuario.ToString())
+                new Claim(ClaimTypes.Name, user.UserName),
+                new Claim(ClaimTypes.NameIdentifier, user.PkUsuario.ToString()),
+                new Claim(ClaimTypes.Role, user.FkRole.ToString())
             };
 
-            var key = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(_configuration["Jwt:Key"]));
-            var creds = new SigningCredentials(key, SecurityAlgorithms.HmacSha256);
+            var claimsIdentity = new ClaimsIdentity(claims, "Cookies");
+            var authProperties = new AuthenticationProperties
+            {
+                IsPersistent = true
+            };
 
-            var token = new JwtSecurityToken(
-                issuer: _configuration["Jwt:Issuer"],
-                audience: _configuration["Jwt:Audience"],
-                claims: claims,
-                expires: DateTime.Now.AddMinutes(30),
-                signingCredentials: creds);
+            await HttpContext.SignInAsync("Cookies", new ClaimsPrincipal(claimsIdentity), authProperties);
 
-            return new JwtSecurityTokenHandler().WriteToken(token);
+            // Redirección basada en rol
+            return user.FkRole switch
+            {
+                1 => RedirectToAction("Index", "User"),
+                2 => RedirectToAction("Index", "UsuarioVerdadero"),
+                _ => RedirectToAction("Index", "Home")
+            };
         }
+
+        [HttpGet]
+        public IActionResult Register()
+        {
+            return View();
+        }
+
+        [HttpPost]
+        public IActionResult Register(RegisterViewModel model)
+        {
+            if (!ModelState.IsValid)
+                return View(model);
+
+            var usuario = new Usuario
+            {
+                UserName = model.Username,
+                Password = model.Password,
+                FkRole = model.Role,
+                Nombre = model.Nombre  // Ahora asignas el nombre desde el campo independiente
+            };
+
+            if (_authService.RegisterUser(usuario))
+            {
+                return RedirectToAction("Login");
+            }
+
+            ModelState.AddModelError(string.Empty, "Error al registrar el usuario.");
+            return View(model);
+        }
+
+        [HttpPost]
+        public async Task<IActionResult> Logout()
+        {
+            // Eliminar la cookie de autenticación
+            HttpContext.Response.Cookies.Delete("AuthToken");
+
+            // Cerrar sesión en ASP.NET Core
+            await HttpContext.SignOutAsync("Cookies");
+
+            return RedirectToAction("Login");
+        }
+
     }
 }
-
-

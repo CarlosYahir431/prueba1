@@ -1,4 +1,5 @@
 ﻿using Azure.Core;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using VelazquezYahir.Models.Domain;
 using VelazquezYahir.Services.IServices;
@@ -30,7 +31,6 @@ namespace VelazquezYahir.Controllers
             _categoriaService.CreateCategoria(categoria);
             return RedirectToAction("Index");
         }
-
         public IActionResult Editar(int id)
         {
             var categoria = _categoriaService.GetCategoriaById(id);
